@@ -9,7 +9,6 @@
       @click="$emit('toggle-aside')"
     >
       <el-icon class="home-icon-arrow"><Expand /></el-icon>
-      <div class="home-text">首页</div>
     </button>
 
     <div class="user">

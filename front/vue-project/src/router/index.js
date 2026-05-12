@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import HomeView from '../views/HomeView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,32 +9,62 @@ const router = createRouter({
       redirect: '/login',
     },
     {
-      path: '/home',
-      name: 'home',
-      component: HomeView,
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: () => import('@/views/LoginView.vue'),
     },
     {
       path: '/register',
       name: 'register',
-      component: RegisterView,
+      component: () => import('@/views/RegisterView.vue'),
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: () => import('@/views/HomeView.vue'),
+      redirect: '/home/dashboard',
+      meta: {
+        requiresAuth: true,
+      },
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: () => import('@/views/DashboardView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        },
+        {
+          path: 'course',
+          name: 'course',
+          component: () => import('@/components/topMain.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        },
+      ],
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/home/dashboard',
     },
   ],
 })
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
+router.beforeEach((to) => {
+  const token = localStorage.getItem('token')
+
+  if (to.matched.some((item) => item.meta.requiresAuth) && !token) {
     ElMessage.error('请先登录')
-    next('/login')
-    return
+    return '/login'
   }
 
-  next()
+  if ((to.path === '/login' || to.path === '/register') && token) {
+    return '/home/dashboard'
+  }
+
+  return true
 })
 
 export default router

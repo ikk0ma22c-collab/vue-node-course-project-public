@@ -2,14 +2,14 @@
   <div class="home">
     <el-container class="home-layout">
       <el-aside class="home-aside" :width="asideWidth">
-        <Aside :is-collapse="isAsideCollapse" />
+        <Aside :is-collapse="isAsideCollapse" @show-dashboard="showDashboard" />
       </el-aside>
       <el-container class="home-content">
         <el-header class="home-header">
           <Header :is-collapse="isAsideCollapse" @toggle-aside="toggleAside" />
         </el-header>
-        <el-main class="home-main">
-          <Main />
+        <el-main class="home-content">
+          <router-view />
         </el-main>
       </el-container>
     </el-container>
@@ -20,13 +20,16 @@
 import { computed, ref } from 'vue'
 import Header from '@/components/topHeader.vue'
 import Aside from '@/components/topAside.vue'
-import Main from '@/components/topMain.vue'
 
-const isAsideCollapse = ref(false)
+const isAsideCollapse = ref(true)
 const asideWidth = computed(() => (isAsideCollapse.value ? '72px' : '200px'))
 
 const toggleAside = () => {
   isAsideCollapse.value = !isAsideCollapse.value
+}
+
+const showDashboard = () => {
+  isAsideCollapse.value = true
 }
 </script>
 

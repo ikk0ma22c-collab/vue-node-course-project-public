@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import asideTable from './asideTable.vue'
@@ -7,10 +7,10 @@ import EditPop from './EditPop.vue'
 import AddPop from './addPop.vue'
 import Pagination from './Pagination.vue'
 import { getCourseList, changeCourse, deleteCourseData, addCourse } from '@/api/index.js'
-import emitter from '@/utils/eventBus.js'
+import { useRoute } from 'vue-router'
 
 const pageSize = ref(7)
-const totalCount = ref(0)
+const route = useRoute()
 const currentCategory = ref('')
 const currentPage = ref(1)
 const editPopVisible = ref(false)
@@ -23,33 +23,40 @@ const searchForm = ref({
 })
 
 const getCourseListdate = async (query = {}) => {
-  const page = query.page || currentPage.value || 1
-  const size = query.size || pageSize.value
   const category = query.category ?? currentCategory.value
-  const params = { page, size }
+  const baseParams = { page: 1, size: pageSize.value }
 
   if (category) {
-    params.category = category
+    baseParams.category = category
   }
 
-  const res = await getCourseList(params)
+  const firstRes = await getCourseList(baseParams)
+  const total = Number(firstRes?.count?.[0]?.total || firstRes?.list?.length || 0)
+  const shouldLoadAll = total > (firstRes?.list?.length || 0)
+  const res = shouldLoadAll
+    ? await getCourseList({ ...baseParams, size: total })
+    : firstRes
   const list = Array.isArray(res?.list) ? res.list : []
 
   courseList.value = list.map((item) => ({
     ...item,
     courseImg: item.courseImg || item.course_img || item.img || item.cover || item.cover_img || '',
   }))
-  totalCount.value = Number(res?.count?.[0]?.total || courseList.value.length)
 }
 
+const getRouteCategory = () => (typeof route.query.category === 'string' ? route.query.category : '')
+
 onMounted(() => {
-  getCourseListdate()
-  emitter.on('project-category-change', handleProjectCategoryChange)
+  currentCategory.value = getRouteCategory()
+  getCourseListdate({ category: currentCategory.value })
 })
 
-onUnmounted(() => {
-  emitter.off('project-category-change', handleProjectCategoryChange)
-})
+watch(
+  () => route.query.category,
+  (category) => {
+    handleProjectCategoryChange(typeof category === 'string' ? category : '')
+  },
+)
 
 const handleProjectCategoryChange = (category) => {
   currentCategory.value = category || ''
@@ -62,14 +69,22 @@ const filteredCourseList = computed(() => {
 
   if (!keyword) return courseList.value
 
-  return courseList.value.filter((course) => course.title.toLowerCase().includes(keyword))
+  return courseList.value.filter((course) =>
+    String(course.title || '')
+      .toLowerCase()
+      .includes(keyword),
+  )
 })
 
 const totalPage = computed(() =>
-  Math.max(Math.ceil((totalCount.value || filteredCourseList.value.length) / pageSize.value), 1),
+  Math.max(Math.ceil(filteredCourseList.value.length / pageSize.value), 1),
 )
 
-const pageCourseList = computed(() => filteredCourseList.value)
+const pageCourseList = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+
+  return filteredCourseList.value.slice(start, start + pageSize.value)
+})
 
 watch(
   () => searchForm.value.keyword,
@@ -91,7 +106,6 @@ const changePage = (page) => {
   if (page < 1 || page > totalPage.value) return
 
   currentPage.value = page
-  getCourseListdate({ page, category: currentCategory.value })
 }
 
 const updateCourseData = async (query) => {
@@ -110,11 +124,9 @@ const deleteCourse = async (course) => {
 
     await deleteCourseData({ id: course.id })
     courseList.value = courseList.value.filter((item) => item.id !== course.id)
-    totalCount.value = Math.max(totalCount.value - 1, 0)
 
     if (currentPage.value > totalPage.value) {
       currentPage.value = totalPage.value
-      await getCourseListdate({ page: currentPage.value, category: currentCategory.value })
     }
 
     ElMessage.success('删除成功')

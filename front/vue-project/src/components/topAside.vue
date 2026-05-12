@@ -10,16 +10,10 @@
       <span class="logo-text">培训管理系统</span>
     </div>
 
-    <el-sub-menu index="1">
-      <template #title>
-        <el-icon><User /></el-icon>
-        <span>用户管理</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item index="1-1" @click="handleMenuClick('1-1')">用户1</el-menu-item>
-        <el-menu-item index="1-2" @click="handleMenuClick('1-2')">用户2</el-menu-item>
-      </el-menu-item-group>
-    </el-sub-menu>
+    <el-menu-item index="dashboard" @click="handleDashboardClick">
+      <el-icon><House /></el-icon>
+      <span>首页</span>
+    </el-menu-item>
 
     <el-sub-menu index="2">
       <template #title>
@@ -41,21 +35,32 @@
 
     <el-sub-menu index="3">
       <template #title>
+        <el-icon><User /></el-icon>
+        <span>用户管理</span>
+      </template>
+      <el-menu-item-group>
+        <el-menu-item index="3-1" @click="handleMenuClick('3-1')">用户1</el-menu-item>
+        <el-menu-item index="3-2" @click="handleMenuClick('3-2')">用户2</el-menu-item>
+      </el-menu-item-group>
+    </el-sub-menu>
+
+    <el-sub-menu index="4">
+      <template #title>
         <el-icon><Location /></el-icon>
         <span>导航</span>
       </template>
       <el-menu-item-group>
-        <el-menu-item index="3-1" @click="handleMenuClick('3-1')">菜单一</el-menu-item>
-        <el-menu-item index="3-2" @click="handleMenuClick('3-2')">菜单二</el-menu-item>
+        <el-menu-item index="4-1" @click="handleMenuClick('4-1')">菜单一</el-menu-item>
+        <el-menu-item index="4-2" @click="handleMenuClick('4-2')">菜单二</el-menu-item>
       </el-menu-item-group>
     </el-sub-menu>
   </el-menu>
 </template>
 
 <script setup>
-import { List, Location, User } from '@element-plus/icons-vue'
+import { House, List, Location, User } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import emitter from '@/utils/eventBus.js'
+import { useRouter } from 'vue-router'
 
 defineProps({
   isCollapse: {
@@ -64,7 +69,15 @@ defineProps({
   },
 })
 
+const emit = defineEmits(['show-dashboard'])
+const router = useRouter()
 const activeMenu = ref('')
+
+const handleDashboardClick = async () => {
+  activeMenu.value = 'dashboard'
+  await router.push('/home/dashboard')
+  emit('show-dashboard')
+}
 
 const handleMenuClick = (index) => {
   if (activeMenu.value === index) {
@@ -75,15 +88,15 @@ const handleMenuClick = (index) => {
   activeMenu.value = index
 }
 
-const handleProjectClick = (index, category) => {
+const handleProjectClick = async (index, category) => {
   if (activeMenu.value === index) {
     activeMenu.value = ''
-    emitter.emit('project-category-change', '')
+    await router.push('/home/course')
     return
   }
 
   activeMenu.value = index
-  emitter.emit('project-category-change', category)
+  await router.push({ path: '/home/course', query: { category } })
 }
 </script>
 

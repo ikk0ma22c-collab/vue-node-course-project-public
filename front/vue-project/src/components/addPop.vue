@@ -25,9 +25,9 @@
       <el-form-item label="课程类型" prop="category">
         <el-select v-model="addForm.category" placeholder="请选择课程类型">
           <el-option label="前端开发" value="front" />
-          <el-option label="后端开发" value="backend" />
+          <el-option label="后端开发" value="back" />
           <el-option label="Python" value="python" />
-          <el-option label="全栈开发" value="fullstack" />
+          <el-option label="全栈开发" value="all" />
         </el-select>
       </el-form-item>
 

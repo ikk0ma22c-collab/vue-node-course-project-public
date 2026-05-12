@@ -67,8 +67,8 @@ defineEmits(['delete-course', 'edit-course'])
 
 const categoryMap = {
   front: '前端开发',
-  backend: '后端开发',
-  fullstack: '后端全栈',
+  back: '后端开发',
+  all: '全栈开发',
   python: 'Python',
 }
 
