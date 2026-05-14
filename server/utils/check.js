@@ -93,6 +93,7 @@ const coursePoint = Joi.number()
     'number.max': '课程评分不能大于10',
     'any.required': '课程评分是必填项'
   })
+  
 
 exports.addcoursecheck = {
   body: {
@@ -102,4 +103,100 @@ exports.addcoursecheck = {
     course_img: course_img,
     point: coursePoint
   }
+}
+
+// ==================== 课时视频相关校验 ====================
+
+const courseVideoId = Joi.number()
+  .integer()
+  .min(1)
+  .required()
+  .messages({
+    'number.base': '课时ID必须是数字',
+    'number.integer': '课时ID必须是整数',
+    'number.min': '课时ID必须大于0',
+    'any.required': '课时ID是必填项',
+  })
+
+const courseId = Joi.number()
+  .integer()
+  .min(1)
+  .required()
+  .messages({
+    'number.base': '课程ID必须是数字',
+    'number.integer': '课程ID必须是整数',
+    'number.min': '课程ID必须大于0',
+    'any.required': '课程ID是必填项',
+  })
+
+const videoTitle = Joi.string()
+  .trim()
+  .min(1)
+  .max(100)
+  .required()
+  .messages({
+    'string.empty': '课时标题不能为空',
+    'string.min': '课时标题不能为空',
+    'string.max': '课时标题不能超过100个字符',
+    'any.required': '课时标题是必填项',
+  })
+
+const videoUrl = Joi.string()
+  .trim()
+  .min(1)
+  .required()
+  .messages({
+    'string.empty': '视频地址不能为空',
+    'string.min': '视频地址不能为空',
+    'any.required': '视频地址是必填项',
+  })
+
+const videoDuration = Joi.string()
+  .allow('')
+  .optional()
+
+const videoSort = Joi.number()
+  .integer()
+  .min(0)
+  .default(0)
+  .messages({
+    'number.base': '排序必须是数字',
+    'number.integer': '排序必须是整数',
+    'number.min': '排序不能小于0',
+  })
+
+// 查询某课程下的视频列表
+exports.findCourseVideoCheck = {
+  query: {
+    course_id: courseId,
+  },
+}
+
+// 新增课时视频
+exports.addCourseVideoCheck = {
+  body: {
+    course_id: courseId,
+    title: videoTitle,
+    video_url: videoUrl,
+    duration: videoDuration,
+    sort: videoSort,
+  },
+}
+
+// 修改课时视频
+exports.updateCourseVideoCheck = {
+  body: {
+    id: courseVideoId,
+    title: videoTitle,
+    video_url: videoUrl,
+    duration: videoDuration,
+    sort: videoSort,
+  },
+}
+
+// 删除课时视频
+exports.deleteCourseVideoCheck = {
+  query: {
+    id: courseVideoId,
+  },
 }

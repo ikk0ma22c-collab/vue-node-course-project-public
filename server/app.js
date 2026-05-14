@@ -35,6 +35,11 @@ const courseRouter = require('./router/course');
 app.use('/api/v1/course', courseRouter);
 
 /**
+ * 课程视频相关接口
+ */
+const courseVideoRouter = require('./router/courseVideo');
+app.use('/api/v1/courseVideo', courseVideoRouter);
+/**
  * 错误中间件
  */
 const Joi = require('joi');

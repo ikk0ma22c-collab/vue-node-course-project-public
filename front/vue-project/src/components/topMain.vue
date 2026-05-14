@@ -2,15 +2,17 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import asideTable from './asideTable.vue'
+import CourseTable from './courseTable.vue'
 import EditPop from './EditPop.vue'
 import AddPop from './addPop.vue'
 import Pagination from './Pagination.vue'
 import { getCourseList, changeCourse, deleteCourseData, addCourse } from '@/api/index.js'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const pageSize = ref(7)
-const route = useRoute()
 const currentCategory = ref('')
 const currentPage = ref(1)
 const editPopVisible = ref(false)
@@ -21,6 +23,9 @@ const courseList = ref([])
 const searchForm = ref({
   keyword: '',
 })
+
+const getRouteCategory = () =>
+  typeof route.query.category === 'string' ? route.query.category : ''
 
 const getCourseListdate = async (query = {}) => {
   const category = query.category ?? currentCategory.value
@@ -33,9 +38,7 @@ const getCourseListdate = async (query = {}) => {
   const firstRes = await getCourseList(baseParams)
   const total = Number(firstRes?.count?.[0]?.total || firstRes?.list?.length || 0)
   const shouldLoadAll = total > (firstRes?.list?.length || 0)
-  const res = shouldLoadAll
-    ? await getCourseList({ ...baseParams, size: total })
-    : firstRes
+  const res = shouldLoadAll ? await getCourseList({ ...baseParams, size: total }) : firstRes
   const list = Array.isArray(res?.list) ? res.list : []
 
   courseList.value = list.map((item) => ({
@@ -44,7 +47,11 @@ const getCourseListdate = async (query = {}) => {
   }))
 }
 
-const getRouteCategory = () => (typeof route.query.category === 'string' ? route.query.category : '')
+const handleProjectCategoryChange = (category) => {
+  currentCategory.value = category || ''
+  currentPage.value = 1
+  getCourseListdate({ page: 1, category: currentCategory.value })
+}
 
 onMounted(() => {
   currentCategory.value = getRouteCategory()
@@ -57,12 +64,6 @@ watch(
     handleProjectCategoryChange(typeof category === 'string' ? category : '')
   },
 )
-
-const handleProjectCategoryChange = (category) => {
-  currentCategory.value = category || ''
-  currentPage.value = 1
-  getCourseListdate({ page: 1, category: currentCategory.value })
-}
 
 const filteredCourseList = computed(() => {
   const keyword = searchForm.value.keyword.trim().toLowerCase()
@@ -183,6 +184,18 @@ const addcourse = async (form) => {
   await getCourseListdate({ page: 1, category: currentCategory.value })
   ElMessage.success('添加成功')
 }
+
+const handleManageVideos = (row) => {
+  router.push({
+    name: 'courseVideoManage',
+    params: {
+      courseId: row.id,
+    },
+    query: {
+      title: row.title,
+    },
+  })
+}
 </script>
 
 <template>
@@ -208,7 +221,12 @@ const addcourse = async (form) => {
       </el-form-item>
     </el-form>
 
-    <asideTable :list="pageCourseList" @delete-course="deleteCourse" @edit-course="openEditPop" />
+    <CourseTable
+      :list="pageCourseList"
+      @delete-course="deleteCourse"
+      @edit-course="openEditPop"
+      @manage-videos="handleManageVideos"
+    />
 
     <Pagination :current-page="currentPage" :total-page="totalPage" @change-page="changePage" />
 

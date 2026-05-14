@@ -43,6 +43,14 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
+        {
+          path: 'course/video_manage/:courseId',
+          name: 'courseVideoManage',
+          component: () => import('@/components/CourseVideoManage.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        },
       ],
     },
     {

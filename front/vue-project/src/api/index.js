@@ -50,3 +50,38 @@ export const addCourse = (data) => {
     data,
   })
 }
+// 课时视频列表
+export const getCourseVideoList = (data) => {
+  return request({
+    url: '/courseVideo/list',
+    method: 'get',
+    data,
+  })
+}
+
+// 新增课时视频
+export const addCourseVideo = (data) => {
+  return request({
+    url: '/courseVideo/add',
+    method: 'post',
+    data,
+  })
+}
+
+// 修改课时视频
+export const updateCourseVideo = (data) => {
+  return request({
+    url: '/courseVideo/update',
+    method: 'post',
+    data,
+  })
+}
+
+// 删除课时视频
+export const deleteCourseVideo = (data) => {
+  return request({
+    url: '/courseVideo/delete',
+    method: 'get',
+    data,
+  })
+}

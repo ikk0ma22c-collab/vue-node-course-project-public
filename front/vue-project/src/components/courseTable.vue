@@ -13,7 +13,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="title" label="课程标题" min-width="280">
+      <el-table-column prop="title" label="课程标题" min-width="340">
         <template #default="{ row }">
           <div class="course-title">{{ row.title }}</div>
           <el-tag class="course-category" size="small" effect="plain">
@@ -22,33 +22,40 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="price" label="课程价格" width="130">
+      <el-table-column prop="price" label="课程价格" width="120" align="center">
         <template #default="{ row }">
-          <span class="course-price">¥{{ row.price }}</span>
+          <span class="course-price">￥{{ row.price }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column prop="point" label="课程评分" width="140">
+      <el-table-column prop="point" label="课程评分" width="170" align="center">
         <template #default="{ row }">
-          <el-rate
-            :model-value="Number(row.point) / 2"
-            disabled
-            allow-half
-            size="small"
-            text-color="#ff9900"
-          />
-          <span class="course-point">{{ row.point }}</span>
+          <div class="course-rating">
+            <el-rate
+              :model-value="Number(row.point) / 2"
+              disabled
+              allow-half
+              size="small"
+              text-color="#ff9900"
+            />
+            <span class="course-point">{{ row.point }}</span>
+          </div>
         </template>
       </el-table-column>
 
-      <el-table-column label="操作" width="170" fixed="right">
+      <el-table-column label="操作" width="230" fixed="right" align="center">
         <template #default="{ row }">
-          <el-button type="primary" size="small" plain @click="$emit('edit-course', row)">
-            编辑
-          </el-button>
-          <el-button type="danger" size="small" plain @click="$emit('delete-course', row)">
-            删除
-          </el-button>
+          <div class="action-buttons">
+            <el-button class="video-btn" type="success" size="small" plain @click="manageVideos(row)">
+              课时管理
+            </el-button>
+            <el-button type="primary" size="small" plain @click="$emit('edit-course', row)">
+              编辑
+            </el-button>
+            <el-button type="danger" size="small" plain @click="$emit('delete-course', row)">
+              删除
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -63,7 +70,11 @@ defineProps({
   },
 })
 
-defineEmits(['delete-course', 'edit-course'])
+const emit = defineEmits(['delete-course', 'edit-course', 'manage-videos'])
+
+const manageVideos = (row) => {
+  emit('manage-videos', row)
+}
 
 const categoryMap = {
   front: '前端开发',
@@ -102,7 +113,7 @@ const tableRowClassName = ({ rowIndex }) =>
 }
 
 .course-table :deep(.el-table__cell) {
-  padding: 7px 0;
+  padding: 8px 0;
 }
 
 .course-table :deep(.course-row-even) {
@@ -123,7 +134,7 @@ const tableRowClassName = ({ rowIndex }) =>
 }
 
 .course-title {
-  max-width: 520px;
+  max-width: 560px;
   margin-bottom: 6px;
   overflow: hidden;
   color: #213c36;
@@ -146,10 +157,34 @@ const tableRowClassName = ({ rowIndex }) =>
   font-weight: 800;
 }
 
+.course-rating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 136px;
+}
+
 .course-point {
-  margin-left: 8px;
   color: #8a6d28;
   font-size: 12px;
   font-weight: 700;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 2px 0;
+}
+
+.action-buttons :deep(.el-button) {
+  margin-left: 0;
+}
+
+.video-btn {
+  min-width: 86px;
 }
 </style>
