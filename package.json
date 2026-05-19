@@ -1,4 +1,8 @@
 {
+  "scripts": {
+    "dev": "npm --prefix front/vue-project run dev",
+    "build": "npm --prefix front/vue-project run build"
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "vue-router": "^4.0.14"

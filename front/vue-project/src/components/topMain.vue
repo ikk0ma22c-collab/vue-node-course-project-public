@@ -110,11 +110,16 @@ const changePage = (page) => {
 }
 
 const updateCourseData = async (query) => {
-  const { title, price, id } = query
-  await changeCourse({ title, price, id })
+  const { title, price, status, id } = query
+  await changeCourse({ title, price, status, id })
 }
 
 const deleteCourse = async (course) => {
+  if (Number(course?.status ?? 0) === 1) {
+    ElMessage.error('商品已上架，无法删除')
+    return
+  }
+
   try {
     await ElMessageBox.confirm(`确定删除《${course.title}》吗？`, '删除确认', {
       confirmButtonText: '确定删除',
@@ -123,7 +128,7 @@ const deleteCourse = async (course) => {
       draggable: true,
     })
 
-    await deleteCourseData({ id: course.id })
+    await deleteCourseData({ id: course.id, status: course.status })
     courseList.value = courseList.value.filter((item) => item.id !== course.id)
 
     if (currentPage.value > totalPage.value) {
@@ -166,11 +171,12 @@ const saveCourse = async (form) => {
     return
   }
 
-  await updateCourseData({ title: form.title, price: form.price, id: form.id })
+  await updateCourseData({ title: form.title, price: form.price, status: form.status, id: form.id })
   courseList.value[index] = {
     ...courseList.value[index],
     title: form.title,
     price: form.price,
+    status: form.status,
   }
 
   closeEditPop()

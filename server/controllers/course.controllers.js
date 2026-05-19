@@ -48,22 +48,25 @@ exports.coursefindController = (req, res) => {
     });
 };
 exports.courseUpdateController = (req, res) => {
-    const { title, price, id } = req.query;
+    const { title, price, status, id } = req.query;
     let arr =[];
     let changeSql = 'UPDATE video SET ';
     /**
      * 修改标题和价格
      */
-    if (title && price) {
+    if (title !== undefined && price !== undefined && status !== undefined) {
+        changeSql += 'title = ?, price = ?, status = ? where id=?';
+        arr = [title, Number(price), Number(status), Number(id)];
+    }else if (title !== undefined && price !== undefined) {
         changeSql += 'title = ?, price = ? where id=?';
         arr = [title, Number(price), Number(id)];
-    }else if (title) {
+    }else if (title !== undefined) {
         /**
          * 修改课程标题
          */
         changeSql += 'title = ? where id=?';
         arr = [title, Number(id)];
-    }else if (price) {
+    }else if (price !== undefined) {
         /**
          * 修改课程价格
          */
@@ -84,7 +87,13 @@ exports.courseUpdateController = (req, res) => {
     });
 }
 exports.courseDeleteController = (req, res) => {
-    const { id , del} = req.query;
+    const { id , del, status} = req.query;
+    if (Number(status) === 1) {
+        return res.send({
+            code: 1,
+            message: '商品已上架，无法删除'
+        });
+    }
     const sql = 'UPDATE video SET del = 1 WHERE id = ?';
     db.query(sql, [Number(id)], (err, result) => {
         if (err) {
@@ -100,16 +109,16 @@ exports.courseDeleteController = (req, res) => {
     });
 }
 exports.courseAddController = (req, res) => {
-  const { title, price, category, course_img, point } = req.body
+  const { title, price, category, course_img, point, status = 0 } = req.body
 
   const sql = `
-    INSERT INTO video (title, price, category, course_img, point, del)
-    VALUES (?, ?, ?, ?, ?, 0)
+    INSERT INTO video (title, price, category, course_img, point, status, del)
+    VALUES (?, ?, ?, ?, ?, ?, 0)
   `
 
   db.query(
     sql,
-    [title, Number(price), category, course_img, Number(point)],
+    [title, Number(price), category, course_img, Number(point), Number(status)],
     (err, result) => {
       if (err) {
         return res.send({

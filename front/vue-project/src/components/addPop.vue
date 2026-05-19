@@ -31,6 +31,14 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="课程状态" prop="status">
+        <el-select v-model="addForm.status" placeholder="请选择课程状态">
+          <el-option label="草稿" :value="0" />
+          <el-option label="已上架" :value="1" />
+          <el-option label="已下架" :value="2" />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="课程图片" prop="course_img">
         <el-input v-model.trim="addForm.course_img" placeholder="请输入课程图片地址" />
       </el-form-item>
@@ -71,6 +79,7 @@ const defaultForm = () => ({
   title: '',
   price: undefined,
   category: '',
+  status: 0,
   course_img: '',
   point: undefined,
 })
@@ -85,6 +94,7 @@ const rules = {
   ],
   price: [{ required: true, type: 'number', message: '课程价格不能为空', trigger: 'change' }],
   category: [{ required: true, message: '请选择课程类型', trigger: 'change' }],
+  status: [{ required: true, type: 'number', message: '请选择课程状态', trigger: 'change' }],
   point: [{ required: true, type: 'number', message: '评分不能为空', trigger: 'change' }],
 }
 
@@ -113,6 +123,7 @@ const handleSubmit = () => {
       title: addForm.title,
       price: addForm.price,
       category: addForm.category,
+      status: addForm.status,
       course_img: addForm.course_img,
       point: addForm.point,
     })

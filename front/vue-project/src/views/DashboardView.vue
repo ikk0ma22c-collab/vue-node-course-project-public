@@ -64,7 +64,7 @@
         <el-table-column prop="priceText" label="价格" width="120" />
         <el-table-column prop="status" label="状态" width="120">
           <template #default="{ row }">
-            <el-tag :type="row.status === '已添加' ? 'success' : 'info'">
+            <el-tag :class="['course-status', row.statusClass]" effect="plain">
               {{ row.status }}
             </el-tag>
           </template>
@@ -92,6 +92,20 @@ const categoryMap = {
   python: 'Python',
 }
 
+const statusMap = {
+  0: '草稿',
+  1: '已上架',
+  2: '已下架',
+}
+
+const statusClassMap = {
+  0: 'status-draft',
+  1: 'status-on',
+  2: 'status-off',
+}
+
+const normalizeStatus = (status) => Number(status ?? 0)
+
 const statList = computed(() => [
   { label: '课程总数', value: courseList.value.length },
   { label: '前端课程', value: getCategoryCount('front') },
@@ -107,7 +121,8 @@ const recentCourses = computed(() =>
       ...course,
       categoryName: categoryMap[course.category] || '精品课程',
       priceText: `¥${course.price ?? 0}`,
-      status: course.status || '已添加',
+      status: statusMap[normalizeStatus(course.status)] || '草稿',
+      statusClass: statusClassMap[normalizeStatus(course.status)] || 'status-draft',
     })),
 )
 
@@ -219,5 +234,23 @@ onMounted(() => {
   color: #66756f;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.course-status.status-draft {
+  border-color: rgb(224 168 0 / 28%);
+  color: #9b6a00;
+  background: rgb(255 193 7 / 18%);
+}
+
+.course-status.status-on {
+  border-color: rgb(47 141 105 / 28%);
+  color: #247b56;
+  background: rgb(47 141 105 / 14%);
+}
+
+.course-status.status-off {
+  border-color: rgb(112 122 133 / 24%);
+  color: #6b7280;
+  background: rgb(112 122 133 / 12%);
 }
 </style>

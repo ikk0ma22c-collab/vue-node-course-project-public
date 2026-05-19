@@ -14,6 +14,14 @@
       <el-form-item label="课程价格" prop="price">
         <el-input v-model.trim="editForm.price" placeholder="请输入课程价格" />
       </el-form-item>
+
+      <el-form-item label="课程状态" prop="status">
+        <el-select v-model="editForm.status" placeholder="请选择课程状态">
+          <el-option label="草稿" :value="0" />
+          <el-option label="已上架" :value="1" />
+          <el-option label="已下架" :value="2" />
+        </el-select>
+      </el-form-item>
     </el-form>
 
     <template #footer>
@@ -44,11 +52,13 @@ const editForm = reactive({
   id: '',
   title: '',
   price: '',
+  status: 0,
 })
 
 const rules = {
   title: [{ required: true, message: '课程标题不能为空', trigger: 'blur' }],
   price: [{ required: true, message: '课程价格不能为空', trigger: 'blur' }],
+  status: [{ required: true, type: 'number', message: '请选择课程状态', trigger: 'change' }],
 }
 
 watch(
@@ -57,6 +67,7 @@ watch(
     editForm.id = course?.id ?? ''
     editForm.title = course?.title ?? ''
     editForm.price = course?.price ?? ''
+    editForm.status = Number(course?.status ?? 0)
     editFormRef.value?.clearValidate()
   },
   { immediate: true },
@@ -75,6 +86,7 @@ const handleSubmit = () => {
       id: editForm.id,
       title: editForm.title,
       price: editForm.price,
+      status: editForm.status,
     })
   })
 }
@@ -96,5 +108,9 @@ const handleSubmit = () => {
 
 :deep(.el-dialog__footer) {
   padding: 14px 24px 20px;
+}
+
+:deep(.el-select) {
+  width: 100%;
 }
 </style>

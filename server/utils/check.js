@@ -40,11 +40,13 @@ exports.findcoursecheck = {
 const id = Joi.number().min(1).integer().required();
 const title = Joi.string().required();
 const price = Joi.number().required();
+const status = Joi.number().valid(0, 1, 2).required();
 exports.updatecoursecheck = {
     query: {
         id: id,
         title: title,
-        price: price
+        price: price,
+        status: status
     }
 };
 const courseTitle = Joi.string()
@@ -93,6 +95,13 @@ const coursePoint = Joi.number()
     'number.max': '课程评分不能大于10',
     'any.required': '课程评分是必填项'
   })
+
+const courseStatus = Joi.number()
+  .valid(0, 1, 2)
+  .default(0)
+  .messages({
+    'any.only': '课程状态不合法'
+  })
   
 
 exports.addcoursecheck = {
@@ -101,7 +110,8 @@ exports.addcoursecheck = {
     price: coursePrice,
     category: courseCategory,
     course_img: course_img,
-    point: coursePoint
+    point: coursePoint,
+    status: courseStatus
   }
 }
 
